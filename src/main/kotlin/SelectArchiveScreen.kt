@@ -1,21 +1,14 @@
 class SelectArchiveScreen(private val archives: MutableList<Archive>) : Screen() {
+
+    private val MENU_WHEN_ARHCHIVES_ARE_EMPTY = "Введите\n2. Создать новый архив\n4. Выйти из программы"
+    private val MENU_WHEN_ARCHIEVES_ARE_FILLED = "Введите\n1. Выбрать архив\n2. Создать новый архив\n3. Посмотреть список всех архивов\n4. Выйти из программы"
+
+
     override fun show() {
 
-        var input: String?
+        val input = WorkWithUserInput.getUserInput(emptyMenu = MENU_WHEN_ARHCHIVES_ARE_EMPTY, filledMenu = MENU_WHEN_ARCHIEVES_ARE_FILLED, isEmptyDataSet = archives.isEmpty())
 
-        if (archives.isEmpty()) {
-            input = WorkWithUserInput.getUserInput("Введите\n2. Создать новый архив\n4. Выйти из программы")
-        } else {
-            input = WorkWithUserInput.getUserInput("Введите\n1. Выбрать архив\n2. Создать новый архив\n3. Посмотреть список всех архивов\n4. Выйти из программы")
-        }
-
-        if (input?.isEmpty() == true) {
-            showError("Ввод не может быть пустым!")
-            show()
-        }
-
-
-        when (input?.toIntOrNull()) {
+        when (input.toInt()) {
             1 -> {
                 val archiveName = WorkWithUserInput.getUserInput("Введите название архива:")
                 val selectedArchive = archives.find { it.name == archiveName }
@@ -25,7 +18,7 @@ class SelectArchiveScreen(private val archives: MutableList<Archive>) : Screen()
                     nextScreen?.previousScreen = this
                     nextScreen?.show()
                 } else {
-                    showError("Архив '$archiveName' не существует.")
+                    WorkWithUserInput.showError("Архив '$archiveName' не существует.")
                     show()
                 }
             }
@@ -39,12 +32,11 @@ class SelectArchiveScreen(private val archives: MutableList<Archive>) : Screen()
             }
             4 -> exit()
             else -> {
-
                 try {
-                    input?.toInt()
-                    showError("Неверный ввод! Пожалуйста, введите корректную цифру!")
+                    input.toInt()
+                    WorkWithUserInput.showError("Неверный ввод! Пожалуйста, введите корректную цифру!")
                 } catch (e: NumberFormatException) {
-                    showError("Неверный ввод! Пожалуйста, введите цифру")
+                    WorkWithUserInput.showError("Неверный ввод! Пожалуйста, введите цифру")
                 }
                 show()
             }

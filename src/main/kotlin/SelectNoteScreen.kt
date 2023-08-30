@@ -1,20 +1,13 @@
 class SelectNoteScreen(private val archive: Archive) : Screen() {
+
+    private val MENU_WHEN_NOTES_ARE_EMPTY = "Введите\n2. Создать новый архив\n4. Выйти из программы"
+    private val MENU_WHEN_NOTES_ARE_FILLED = "Введите\n1. Выбрать архив\n2. Создать новый архив\n3. Посмотреть список всех архивов\n4. Выйти из программы"
+
     override fun show() {
 
-        var input: String?
+        val input = WorkWithUserInput.getUserInput(emptyMenu = MENU_WHEN_NOTES_ARE_EMPTY, filledMenu = MENU_WHEN_NOTES_ARE_FILLED, isEmptyDataSet = archive.notes.isEmpty())
 
-        if (archive.notes.isEmpty()) {
-            input = WorkWithUserInput.getUserInput("Введите\n2. Создать новую заметку\n4.Вернуться назад")
-        } else {
-            input = WorkWithUserInput.getUserInput("Введите\n1. Выбрать заметку\n2. Создать новую заметку\n3.Посмотреть все заметки\n4.Вернуться назад")
-        }
-
-        if (input?.isEmpty() == true) {
-            showError("Ввод не может быть пустым!")
-            show()
-        }
-
-        when (input?.toIntOrNull()) {
+        when (input.toInt()) {
             1 -> {
                 val noteName = WorkWithUserInput.getUserInput("Введите название заметки:")
                 val selectedNote = archive.notes.find { it.name == noteName }
@@ -24,7 +17,7 @@ class SelectNoteScreen(private val archive: Archive) : Screen() {
                     nextScreen?.previousScreen = this
                     nextScreen?.show()
                 } else {
-                    showError("Заметка '$noteName' не существует")
+                    WorkWithUserInput.showError("Заметка '$noteName' не существует")
                     show()
                 }
             }
@@ -40,7 +33,7 @@ class SelectNoteScreen(private val archive: Archive) : Screen() {
 
             4 -> previousScreen?.show()
             else -> {
-                showError("Неверный ввод! Пожалуйста, введите корректную команду!")
+                WorkWithUserInput.showError("Неверный ввод! Пожалуйста, введите корректную команду!")
                 show()
             }
         }
