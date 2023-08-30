@@ -8,7 +8,7 @@ class SelectArchiveScreen(private val archives: MutableList<Archive>) : Screen()
 
         val input = WorkWithUserInput.getUserInput(emptyMenu = MENU_WHEN_ARHCHIVES_ARE_EMPTY, filledMenu = MENU_WHEN_ARCHIEVES_ARE_FILLED, isEmptyDataSet = archives.isEmpty())
 
-        when (input.toInt()) {
+        when (input.toIntOrNull()) {
             1 -> {
                 val archiveName = WorkWithUserInput.getUserInput("Введите название архива:")
                 val selectedArchive = archives.find { it.name == archiveName }
@@ -27,17 +27,12 @@ class SelectArchiveScreen(private val archives: MutableList<Archive>) : Screen()
                 nextScreen?.show()
             }
             3 -> {
-                println(archives.joinToString(prefix = "[", postfix = "]"))
+                println("Названия архивов: ${archives.joinToString(prefix = "[", postfix = "]")}")
                 show()
             }
             4 -> exit()
             else -> {
-                try {
-                    input.toInt()
-                    WorkWithUserInput.showError("Неверный ввод! Пожалуйста, введите корректную цифру!")
-                } catch (e: NumberFormatException) {
-                    WorkWithUserInput.showError("Неверный ввод! Пожалуйста, введите цифру")
-                }
+                WorkWithUserInput.checkForErrorIfNotCorrectInteger(input)
                 show()
             }
         }

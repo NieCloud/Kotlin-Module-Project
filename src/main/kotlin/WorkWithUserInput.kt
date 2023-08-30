@@ -5,26 +5,37 @@ class WorkWithUserInput {
 
     companion object {
         fun getUserInput(emptyMenu: String = "", filledMenu:String = "", isEmptyDataSet: Boolean = true): String {
-            if (isEmptyDataSet) {
-                println(emptyMenu)
-            } else {
-                println(filledMenu)
+
+            while (true) {
+                if (isEmptyDataSet) {
+                    println(emptyMenu)
+                } else {
+                    println(filledMenu)
+                }
+
+                val userInput = readlnOrNull()
+
+                if (userInput.isNullOrBlank()) {
+                    showError("Ввод не может быть пустым!")
+                } else {
+                    return userInput
+                }
             }
-            val userInput = readLine()
-            if (userInput?.isEmpty() == true) {
-                showError("Ввод не может быть пустым!")
-                getUserInput(emptyMenu, filledMenu, isEmptyDataSet)
+        }
+
+        fun checkForErrorIfNotCorrectInteger(input: String) {
+            try {
+                input.toInt()
+                showError("Неверный ввод! Пожалуйста, введите корректную цифру!")
+            } catch (e: NumberFormatException) {
+                showError("Неверный ввод! Пожалуйста, введите цифру")
             }
-            return userInput.toString()
         }
 
         fun showError(message: String) {
             println("Ошибка: $message")
         }
 
-        fun workWithSelectingArchives(
-            archives: MutableList<Archive>) {
 
-        }
     }
 }

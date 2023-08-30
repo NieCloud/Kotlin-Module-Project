@@ -5,6 +5,7 @@ class CreateNoteScreen(private val archive: Archive) : Screen() {
         val noteContent = WorkWithUserInput.getUserInput("Введите содержание новой заметки:")
 
         val newNote = Note(noteName, noteContent)
+        println(noteName + noteContent)
         archive.notes.add(newNote)
         println("Заметка создана!")
         previousScreen?.show()
