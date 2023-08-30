@@ -1,10 +1,22 @@
 class SelectNoteScreen(private val archive: Archive) : Screen() {
     override fun show() {
-        val input = getUserInput("Введите 1 чтобы выбрать заметку, 2 чтобы создать новую заметку или 3 чтобы вернуться назад")
+
+        var input: String?
+
+        if (archive.notes.isEmpty()) {
+            input = WorkWithUserInput.getUserInput("Введите\n2. Создать новую заметку\n4.Вернуться назад")
+        } else {
+            input = WorkWithUserInput.getUserInput("Введите\n1. Выбрать заметку\n2. Создать новую заметку\n3.Посмотреть все заметки\n4.Вернуться назад")
+        }
+
+        if (input?.isEmpty() == true) {
+            showError("Ввод не может быть пустым!")
+            show()
+        }
 
         when (input?.toIntOrNull()) {
             1 -> {
-                val noteName = getUserInput("Введите название заметки:")
+                val noteName = WorkWithUserInput.getUserInput("Введите название заметки:")
                 val selectedNote = archive.notes.find { it.name == noteName }
                 if (selectedNote != null) {
                     println("Заметка выбрана!")
@@ -21,7 +33,12 @@ class SelectNoteScreen(private val archive: Archive) : Screen() {
                 nextScreen?.previousScreen = this
                 nextScreen?.show()
             }
-            3 -> previousScreen?.show()
+            3 -> {
+                println(archive.notes.joinToString(prefix = "[", postfix = "]"))
+                show()
+            }
+
+            4 -> previousScreen?.show()
             else -> {
                 showError("Неверный ввод! Пожалуйста, введите корректную команду!")
                 show()
