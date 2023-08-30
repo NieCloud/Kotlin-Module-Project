@@ -1,6 +1,6 @@
 class SelectArchiveScreen(private val archives: MutableList<Archive>) : Screen() {
     override fun show() {
-        val input = getUserInput("Введите 1, чтобы выбрать архив, 2 чтобы создать новый архив и 3 чтобы выйти из программы")
+        val input = getUserInput("Введите\n1. Выбрать архив\n2. Создать новый архив\n3. Посмотреть список всех архивов\n4. Выйти из программы")
         when (input?.toIntOrNull()) {
             1 -> {
                 val archiveName = getUserInput("Введите название архива:")
@@ -19,7 +19,15 @@ class SelectArchiveScreen(private val archives: MutableList<Archive>) : Screen()
                 nextScreen = CreateArchiveScreen(archives)
                 nextScreen?.show()
             }
-            3 -> exit()
+            3 -> {
+                print("Архивы: [ ")
+                for (item in archives) {
+                    print("${item.name},")
+                }
+                println(" ]")
+                show()
+            }
+            4 -> exit()
             else -> {
                 showError("Неверный ввод! Пожалуйста, введите корректную команду!")
                 show()
