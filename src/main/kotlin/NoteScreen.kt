@@ -3,7 +3,7 @@ class NoteScreen(private val note: Note) : Screen() {
         println("Заметка:")
         println("Название заметки: ${note.name}")
         println("Содержание заметки: ${note.content}")
-        val input = WorkWithUserInput.getUserInput("\nВведите\n1. Вернуться назад\n2. Отредактировать содержимое заметки")
+        val input = WorkWithUserInput.getUserInput("\nВведите номер:\n1. Вернуться назад\n2. Отредактировать содержимое заметки")
         when (input.toIntOrNull()) {
             1 -> previousScreen?.show() ?: exit()
             2 -> {

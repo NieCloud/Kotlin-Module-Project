@@ -1,7 +1,7 @@
 class SelectNoteScreen(private val archive: Archive) : Screen() {
 
-    private val MENU_WHEN_NOTES_ARE_EMPTY = "Введите\n1. Создать новую заметку\n2. Вернуться в меню Архивов"
-    private val MENU_WHEN_NOTES_ARE_FILLED = "Введите\n1. Выбрать заметку\n2. Cоздать новую заметку\n3. Посмотреть все заметки\n4. Вернуться в меню Архивов"
+    private val MENU_WHEN_NOTES_ARE_EMPTY = "Введите номер:\n1. Создать новую заметку\n2. Вернуться в меню Архивов"
+    private val MENU_WHEN_NOTES_ARE_FILLED = "Введите номер:\n1. Выбрать заметку\n2. Cоздать новую заметку\n3. Посмотреть все заметки\n4. Вернуться в меню Архивов"
 
     override fun show() {
 
@@ -54,15 +54,27 @@ class SelectNoteScreen(private val archive: Archive) : Screen() {
     }
 
     fun chooseNote() {
-        val noteName = WorkWithUserInput.getUserInput("Введите название заметки:")
-        val selectedNote = archive.notes.find { it.name == noteName }
+        var noteNumber: Int? = null
+
+        while (noteNumber == null) {
+            val input = WorkWithUserInput.getUserInput("Введите номер заметки:")
+            noteNumber = input.toIntOrNull()
+
+            if (noteNumber == null) {
+                WorkWithUserInput.showError("Некорректный ввод. Введите целое число.")
+            }
+        }
+
+
+
+        val selectedNote = archive.notes.find { it.uniqueNumber == noteNumber }
         if (selectedNote != null) {
             println("Заметка выбрана!")
             nextScreen = NoteScreen(selectedNote)
             nextScreen?.previousScreen = this
             nextScreen?.show()
         } else {
-            WorkWithUserInput.showError("Заметка '$noteName' не существует")
+            WorkWithUserInput.showError("Заметки с номером '$noteNumber' не существует")
             show()
         }
     }
