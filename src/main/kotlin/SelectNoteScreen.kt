@@ -1,80 +1,56 @@
 class SelectNoteScreen(private val archive: Archive) : Screen() {
 
-    private val MENU_WHEN_NOTES_ARE_EMPTY = "Введите номер:\n1. Создать новую заметку\n2. Вернуться в меню Архивов"
-    private val MENU_WHEN_NOTES_ARE_FILLED = "Введите номер:\n1. Выбрать заметку\n2. Cоздать новую заметку\n3. Посмотреть все заметки\n4. Вернуться в меню Архивов"
+    private val MENU_HEADER = "Введите номер:\n"
 
     override fun show() {
+        val input = WorkWithUserInput.getUserInput(
+            emptyMenu = getMenuWhenEmpty(),
+            filledMenu = getMenuWithNotes(),
+            isEmptyDataSet = archive.notes.isEmpty()
+        )
 
-        val input = WorkWithUserInput.getUserInput(emptyMenu = MENU_WHEN_NOTES_ARE_EMPTY, filledMenu = MENU_WHEN_NOTES_ARE_FILLED, isEmptyDataSet = archive.notes.isEmpty())
-
-        if (archive.notes.isEmpty()) {
-            when (input.toIntOrNull()) {
-                1 -> goToNotesCreationMenu()
-                2 -> previousScreen?.show()
-                else -> checkNotesForInput(input)
-            }
-        } else {
-            when (input.toIntOrNull()) {
-                1 -> {
-                    showNotesNames()
-                    chooseNote()
-                }
-                2 -> goToNotesCreationMenu()
-                3 -> showAllNotes()
-                4 -> previousScreen?.show()
-                else -> checkNotesForInput(input)
-            }
+        val userInput = input.toIntOrNull()
+        when (userInput) {
+            1 -> goToNotesCreationMenu()
+            in 2 until 2 + archive.notes.size -> chooseNote(userInput!! - 1)
+            2 + archive.notes.size -> previousScreen?.show()
+            else -> checkNotesForInput(input)
         }
     }
 
-    fun checkNotesForInput(input: String) {
+    private fun getMenuWhenEmpty() = "$MENU_HEADER 1. Создать новую заметку\n2. Вернуться в меню Архивов"
+
+    private fun getMenuWithNotes(): String {
+        val menuBuilder = StringBuilder(MENU_HEADER)
+        menuBuilder.append("1. Создать новую заметку\n")
+        archive.notes.forEachIndexed { index, note ->
+            menuBuilder.append("${index + 2}. Это моя уже созданная заметка: ${note.name}\n")
+        }
+        menuBuilder.append("${archive.notes.size + 2}. Вернуться в меню Архивов")
+        return menuBuilder.toString()
+    }
+
+
+    private fun checkNotesForInput(input: String) {
         WorkWithUserInput.checkForErrorIfNotCorrectInteger(input)
         show()
     }
 
-    fun showAllNotes() {
-        val notesString = archive.notes.joinToString("\n", prefix = "[", postfix = "]")
-        println("Заметки:\n$notesString\n")
-        show()
+    private fun goToNotesCreationMenu() {
+        val nextScreen = CreateNoteScreen(archive)
+        nextScreen.previousScreen = this
+        nextScreen.show()
     }
 
-    fun showNotesNames() {
-        println("Названия заметок:")
-        var startNumber = 1
-        for (i in archive.notes) {
-            println("${startNumber}. ${i.name}")
-            startNumber++
-        }
-    }
-
-    fun goToNotesCreationMenu() {
-        nextScreen = CreateNoteScreen(archive)
-        nextScreen?.previousScreen = this
-        nextScreen?.show()
-    }
-
-    fun chooseNote() {
-        var noteNumber: Int? = null
-
-        while (noteNumber == null) {
-            val input = WorkWithUserInput.getUserInput("Введите номер заметки:")
-            noteNumber = input.toIntOrNull()
-
-            if (noteNumber == null) {
-                WorkWithUserInput.showError("Некорректный ввод. Введите целое число.")
-            }
-        }
-
-
-
-        val selectedNote = archive.notes.find { it.uniqueNumber == noteNumber }
+    private fun chooseNote(noteIndex: Int) {
+        val selectedNote = archive.notes.getOrNull(noteIndex - 1)
         if (selectedNote != null) {
-            println("Заметка выбрана!")
-            nextScreen = NoteScreen(selectedNote)
-            nextScreen?.previousScreen = this
-            nextScreen?.show()
+            println("Заметка ${selectedNote.name} выбрана!")
+            val nextScreen = NoteScreen(selectedNote)
+            nextScreen.previousScreen = this
+            nextScreen.show()
         } else {
-            WorkWithUserInput.showError("Заметки с номером '$noteNumber' не существует")
+            WorkWithUserInput.showError("Заметки с номером '$noteIndex' не существует")
             show()
         }
     }

@@ -1,6 +1,5 @@
 class SelectArchiveScreen(private val archives: MutableList<Archive>) : Screen() {
 
-
     private val MENU_WHEN_ARCHIVES_ARE_EMPTY = "Введите номер:\n1. Создать новый архив\n2. Выйти из программы"
 
     override fun show() {
@@ -10,43 +9,41 @@ class SelectArchiveScreen(private val archives: MutableList<Archive>) : Screen()
             isEmptyDataSet = archives.isEmpty()
         )
 
+        val userInput = input.toIntOrNull()
+
         if (archives.isEmpty()) {
-            when (input.toIntOrNull()) {
+            when (userInput) {
                 1 -> goToNewArchiveCreation()
                 2 -> exit()
-                else -> checkArchievesForInput(input)
+                else -> checkArchivesForInput(input)
             }
         } else {
-            val selectedArchiveIndex = input.toIntOrNull()
-            if (selectedArchiveIndex != null && selectedArchiveIndex >= 3 && selectedArchiveIndex <= archives.size + 2) {
-                // The user selected an archive, so go directly to SelectNoteScreen
-                val selectedArchive = archives[selectedArchiveIndex - 3]
-                println("Архив ${selectedArchive.name} выбран!")
-                val nextScreen = SelectNoteScreen(selectedArchive)
-                nextScreen.previousScreen = this
-                nextScreen.show()
-            } else {
-                when (selectedArchiveIndex) {
-                    1 -> goToNewArchiveCreation()
-                    archives.size + 2 -> exit()
-                    else -> checkArchievesForInput(input)
+            val exitNumber = archives.size + 2
+            when (userInput) {
+                1 -> goToNewArchiveCreation()
+                exitNumber -> exit()
+                in 2 until exitNumber -> {
+                    val selectedArchive = archives[userInput!! - 2] // Use not-null assertion
+                    println("Архив ${selectedArchive.name} выбран!")
+                    val nextScreen = SelectNoteScreen(selectedArchive)
+                    nextScreen.previousScreen = this
+                    nextScreen.show()
                 }
+                else -> checkArchivesForInput(input)
             }
+
         }
     }
 
-    fun checkArchievesForInput(input: String) {
+    private fun checkArchivesForInput(input: String) {
         WorkWithUserInput.checkForErrorIfNotCorrectInteger(input)
         show()
     }
 
-    fun printArchievesNames() {
-        println("Названия архивов и их уникальные номера: ${archives.joinToString(prefix = "[", postfix = "]")}")
-    }
-
-    fun goToNewArchiveCreation() {
-        nextScreen = CreateArchiveScreen(archives)
-        nextScreen?.show()
+    private fun goToNewArchiveCreation() {
+        val nextScreen = CreateArchiveScreen(archives)
+        nextScreen.previousScreen = this
+        nextScreen.show()
     }
 
     private fun getMenuWithArchives(): String {
@@ -54,30 +51,9 @@ class SelectArchiveScreen(private val archives: MutableList<Archive>) : Screen()
         menuBuilder.append("Введите номер:\n")
         menuBuilder.append("1. Создать новый архив\n")
         for ((index, archive) in archives.withIndex()) {
-            menuBuilder.append("${index + 2}. Это мой уже созданный \" ${archive.name}\"\n")
+            menuBuilder.append("${index + 2}. Это мой уже созданный архив с названием: \"${archive.name}\"\n")
         }
         menuBuilder.append("${archives.size + 2}. Выйти из программы")
         return menuBuilder.toString()
     }
-
-    private fun chooseArchive() {
-        var archiveNumber: Int? = null
-
-        while (archiveNumber == null) {
-            val input = WorkWithUserInput.getUserInput("Введите номер архива:")
-            archiveNumber = input.toIntOrNull()
-
-            if (archiveNumber == null || archiveNumber !in 1..archives.size) {
-                WorkWithUserInput.showError("Некорректный ввод. Введите корректный номер архива.")
-            }
-        }
-
-        val selectedArchive = archives[archiveNumber - 1]
-        println("Архив ${selectedArchive.name} выбран!")
-        val nextScreen = SelectNoteScreen(selectedArchive)
-        nextScreen.previousScreen = this
-        nextScreen.show()
-    }
 }
-
-//
