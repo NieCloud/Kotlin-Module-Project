@@ -3,17 +3,23 @@ class NoteScreen(private val note: Note) : Screen() {
         println("Заметка:")
         println("Название заметки: ${note.name}")
         println("Содержание заметки: ${note.content}")
-        val input = getUserInput("\nВведите 1 чтобы вернуться или 2 чтобы отредактировать содержимое заметки")
-        when (input?.toIntOrNull()) {
+        val input = WorkWithUserInput.getUserInput("\nВведите номер:\n1. Вернуться назад\n2. Отредактировать содержимое заметки")
+        when (input.toIntOrNull()) {
             1 -> previousScreen?.show() ?: exit()
             2 -> {
-                val newContent = getUserInput("Введите новое содержание заметки:")
-                note.content = newContent.toString()
-                println("Содержание заметки обновлено!")
-                show()
+                val newContent = WorkWithUserInput.getUserInput("Введите новое содержание заметки:")
+
+                if (newContent.isEmpty()) {
+                    WorkWithUserInput.showError("Ввод не может быть пустым!")
+                    show()
+                } else {
+                    note.content = newContent
+                    println("Содержание заметки обновлено!")
+                    show()
+                }
             }
             else -> {
-                showError("Неверный ввод! Пожалуйста, введите корректную команду!")
+                WorkWithUserInput.showError("Неверный ввод! Пожалуйста, введите корректную команду!")
                 show()
             }
         }
